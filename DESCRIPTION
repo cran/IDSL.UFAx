@@ -1,7 +1,7 @@
 Package: IDSL.UFAx
 Type: Package
 Title: Exhaustive Chemical Enumeration for Ultimate Formula Annotation
-Version: 1.0
+Version: 1.0.1
 Authors@R: c(
     person(family = "Fakouri-Baygi", given = "Sadjad", email = "sadjad.fakouri-baygi@mssm.edu",
     role = c("cre","aut"), comment = c(ORCID = "0000-0002-6864-6911")),
@@ -22,6 +22,6 @@ Encoding: UTF-8
 LazyData: true
 Archs: i386, x64
 NeedsCompilation: no
-Packaged: 2022-01-04 17:30:40 UTC; sfbaygi
+Packaged: 2022-01-08 11:22:12 UTC; sfbaygi
 Repository: CRAN
-Date/Publication: 2022-01-06 09:20:04 UTC
+Date/Publication: 2022-01-12 14:22:49 UTC

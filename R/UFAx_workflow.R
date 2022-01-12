@@ -704,7 +704,7 @@ UFAx_workflow <- function(spreadsheet) {
                     mzList[, 10] <- round(mzList[, 10], 2)
                     mzList[, 12] <- round(mzList[, 12], 2)
                     ##
-                    MolFlist <- hill_molecular_formula_messageer(Elements, MoleFormVecMat[x_in_range[mzList[, 2]], ])
+                    MolFlist <- hill_molecular_formula_printer(Elements, MoleFormVecMat[x_in_range[mzList[, 2]], ])
                     mzList[, 2] <- SizeIP_IsotopicProfile_DataBase[mzList[, 2]]
                     ##
                     ex_chem_enum_spa_annontated_table <- cbind(matrix(mzList[, 1:2], ncol = 2), MolFlist, matrix(mzList[, 3:13], ncol = 11))
@@ -762,7 +762,7 @@ UFAx_workflow <- function(spreadsheet) {
       write.csv(exhaustive_chemical_enumeration_annotated_table, file = paste0(output_path, "/exhaustive_chemical_enumeration_annotated_table_", ECE0005, ".csv"))
       message("Completed the exhaustive chemical enumeration analysis!!!")
       required_time <- Sys.time() - initiation_time
-      message(required_time)
+      print(required_time)
     } else {
       message("Please visit   https://ufa.idsl.me    for instructions!!!")
     }
