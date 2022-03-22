@@ -29,7 +29,7 @@ UFAx_workflow <- function(spreadsheet) {
     message("The UFAx spreadsheet was not produced properly!")
   }
   ##
-  if (checkpoint_parameter) {
+  if (checkpoint_parameter == TRUE) {
     x0001 <- which(PARAM_ECE[, 1] == "ECE0001")
     address_pl <- gsub("\\", "/", PARAM_ECE[x0001, 2], fixed = TRUE)
     PARAM_ECE[x0001, 2] <- address_pl
@@ -422,7 +422,7 @@ UFAx_workflow <- function(spreadsheet) {
       }
     }
     ############################################################################
-    if (checkpoint_parameter) {
+    if (checkpoint_parameter == TRUE) {
       message("The spreadsheet is consistent with the IDSL.UFAx workflow!")
       ##
       Elements <- c("As", "Br", "Cl", "Na", "Si", "B",  "C", "F",  "H",  "I",  "K",  "N",  "O",  "P",  "S") # DO NOT change this order!
@@ -439,12 +439,12 @@ UFAx_workflow <- function(spreadsheet) {
         ##
         set_1 <- comboGeneral(qvec,1,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         
         set_2 <- comboGeneral(qvec,2,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_2_a <- set_2
         set_2_a[!set_2_a%in%carbon_masses] <- 0
@@ -453,7 +453,7 @@ UFAx_workflow <- function(spreadsheet) {
         
         set_3 <- comboGeneral(qvec,3,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_3_a <- set_3
         set_3_a[!set_3_a%in%carbon_masses] <- 0
@@ -462,7 +462,7 @@ UFAx_workflow <- function(spreadsheet) {
         
         set_4 <- comboGeneral(qvec,4,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_4_a <- set_4
         set_4_a[!set_4_a%in%carbon_masses] <- 0
@@ -471,7 +471,7 @@ UFAx_workflow <- function(spreadsheet) {
         
         set_5 <- comboGeneral(qvec,5,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_5_a <- set_5
         set_5_a[!set_5_a%in%carbon_masses] <- 0
@@ -480,7 +480,7 @@ UFAx_workflow <- function(spreadsheet) {
         
         set_6 <- comboGeneral(qvec,6,FALSE,constraintFun = "sum",
                               comparisonFun = c(">=","<="),
-                              limitConstraints = c(query_mz-mass_accuracy, query_mz+mass_accuracy),
+                              limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_6_a <- set_6
         set_6_a[!set_6_a%in%carbon_masses] <- 0
@@ -721,7 +721,7 @@ UFAx_workflow <- function(spreadsheet) {
       exhaustive_chemical_enumeration_call <- gsub("int_cutoff_str", int_cutoff_str, exhaustive_chemical_enumeration_call)
       eval(parse(text = exhaustive_chemical_enumeration_call))
       ##########################################################################
-      outputer003 <- MS_deconvoluter(mass_spec_file)
+      outputer003 <- IPA_MSdeconvoluter(HRMS_path = mass_spec_file, MSfile = "")
       spectraList <- outputer003[[1]]
       ## Creating the log folder
       output_path_log <- paste0(output_path, "/log_ECE_annotation_", ECE0005, "/")
@@ -734,14 +734,16 @@ UFAx_workflow <- function(spreadsheet) {
       if (osType == "Windows") {
         clust <- makeCluster(number_processing_threads)
         registerDoSNOW(clust)
+        ##
         exhaustive_chemical_enumeration_annotated_table <- foreach(i_mz = selected_IPA_peaks, .combine = 'rbind', .verbose = FALSE) %dopar% {
           exhaustive_chemical_enumeration_call(i_mz)
         }
+        ##
         stopCluster(clust)
       }
       #
       if (osType == "Linux") {
-        exhaustive_chemical_enumeration_annotated_table <- do.call(rbind, mclapply(selected_IPA_peaks, function (i_mz) {
+        exhaustive_chemical_enumeration_annotated_table <- do.call(rbind, mclapply(selected_IPA_peaks, function(i_mz) {
           exhaustive_chemical_enumeration_call(i_mz)
         }, mc.cores = number_processing_threads))
         closeAllConnections()
