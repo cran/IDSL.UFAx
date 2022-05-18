@@ -9,7 +9,7 @@ UFAx_molecular_formula_library_search <- function(molecular_formula_ions, IonPat
   osType <- Sys.info()[['sysname']]
   if (osType == "Windows") {
     clust <- makeCluster(number_processing_threads)
-    registerDoSNOW(clust)
+    registerDoParallel(clust)
     ##
     print("Initiated deconvoluting molecular formulas!!!")
     MolVecMat <- foreach(i = 1:L_MolF, .combine = 'rbind', .verbose = FALSE) %dopar% {
@@ -48,9 +48,9 @@ UFAx_molecular_formula_library_search <- function(molecular_formula_ions, IonPat
     print("Completed calculating molecular formulas from the ionization pathways!!!")
     ##
     stopCluster(clust)
-  }
-  #
-  if (osType == "Linux") {
+    ##
+  } else if (osType == "Linux") {
+    ##
     print("Initiated deconvoluting molecular formulas!!!")
     MolVecMat <- do.call(rbind, mclapply(1:L_MolF, function(i) {
       formula_vector_generator(molecular_formula_ions[i], Elements, L_Elements)

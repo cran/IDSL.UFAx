@@ -26,15 +26,15 @@ UFAx_score_coefficient_corrector <- function(annotated_molf_address, maxNEME, Sc
   ##
   if (osType == "Windows") {
     clust <- makeCluster(number_processing_threads)
-    registerDoSNOW(clust)
+    registerDoParallel(clust)
     ##
     annotated_molf_updated <- foreach(i = 1:length(peaks), .combine = 'rbind', .verbose = FALSE) %dopar% {
       annotated_molf_updated_call(i)
     }
     ##
     stopCluster(clust)
-  }
-  if (osType == "Linux") {
+    ##
+  } else if (osType == "Linux") {
     ##
     annotated_molf_updated <- do.call(rbind, mclapply(1:length(peaks), function(i) {
       annotated_molf_updated_call(i)

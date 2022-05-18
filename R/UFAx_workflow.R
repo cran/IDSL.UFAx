@@ -57,8 +57,8 @@ UFAx_workflow <- function(spreadsheet) {
         selected_IPA_peaks <- 1:n_peaks
         message("The enitre 12C m/z values in the peaklist were placed in the processing row! Annotated molecular formulas for peak IDs are kept in the 'log_ECE_annotation_' folder!")
       } else {
-        selected_IPA_peaks <- eval(parse(text = paste0("c(", ECE0003, ")")))
-        if (max(selected_IPA_peaks) > n_peaks) {
+        selected_IPA_peaks <- tryCatch(eval(parse(text = paste0("c(", ECE0003, ")"))), error = function(e){NA})
+        if (is.na(selected_IPA_peaks[1]) | (max(selected_IPA_peaks) > n_peaks)) {
           checkpoint_parameter <- FALSE
           message("ERROR!!! Problem with ECE0003! The range of indices are out of the peaklist dimension!")
         } else {
@@ -89,7 +89,7 @@ UFAx_workflow <- function(spreadsheet) {
     output_path <- gsub("\\", "/", PARAM_ECE[x0006, 2], fixed = TRUE)
     PARAM_ECE[x0006, 2] <- output_path
     if (!dir.exists(output_path)) {
-      tryCatch(dir.create(output_path))
+      tryCatch(dir.create(output_path), error = function(e){print("")})
       if (!dir.exists(output_path)) {
         message("ERROR!!! Problem with ECE0006! R can only create one folder!")
         checkpoint_parameter <- FALSE
@@ -284,8 +284,8 @@ UFAx_workflow <- function(spreadsheet) {
       checkpoint_parameter <- FALSE
     }
     ##
-    UFA_IP_memeory_variables <- eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0024'), 2], ")")))
-    if (length(UFA_IP_memeory_variables) != 2) {
+    UFA_IP_memeory_variables <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0024'), 2], ")"))), error = function(e){NA})
+    if ((length(UFA_IP_memeory_variables) != 2) | is.na(UFA_IP_memeory_variables[1])) {
       message("ERROR!!! Problem with ECE0024! This parameter should be a vector of two positive numbers!")
       checkpoint_parameter <- FALSE
     }
@@ -377,8 +377,8 @@ UFAx_workflow <- function(spreadsheet) {
       }
     }
     ##
-    Score_coeff <- eval(parse(text = PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0033'), 2]))
-    if (is.null(Score_coeff)) {
+    Score_coeff <- tryCatch(eval(parse(text = PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0033'), 2])), error = function(e){NA})
+    if (is.na(Score_coeff[1])) {
       message("ERROR!!! Problem with ECE0033! This parameter should be a vector of five positive numbers!")
       checkpoint_parameter <- FALSE
     } else {
@@ -402,8 +402,8 @@ UFAx_workflow <- function(spreadsheet) {
     }
     ##
     if (tolower(ECE0034) == "yes") {
-      IonPathways <- eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0035'), 2], ")")))
-      if (length(IonPathways) == 0) {
+      IonPathways <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0035'), 2], ")"))), error = function(e){NA})
+      if (is.na(IonPathways[1])) {
         message("ERROR!!! Problem with ECE0035!")
         checkpoint_parameter <- FALSE
       }
@@ -726,23 +726,23 @@ UFAx_workflow <- function(spreadsheet) {
       ## Creating the log folder
       output_path_log <- paste0(output_path, "/log_ECE_annotation_", ECE0005, "/")
       if (!dir.exists(output_path_log)) {
-        tryCatch(dir.create(output_path_log))
+        tryCatch(dir.create(output_path_log), error = function(e) {stop("Can't create the log folder!!!")})
       }
       ##
       message("Initiated the exhaustive chemical enumeration analysis!!!")
       osType <- Sys.info()[['sysname']]
       if (osType == "Windows") {
         clust <- makeCluster(number_processing_threads)
-        registerDoSNOW(clust)
+        registerDoParallel(clust)
         ##
         exhaustive_chemical_enumeration_annotated_table <- foreach(i_mz = selected_IPA_peaks, .combine = 'rbind', .verbose = FALSE) %dopar% {
           exhaustive_chemical_enumeration_call(i_mz)
         }
         ##
         stopCluster(clust)
-      }
-      #
-      if (osType == "Linux") {
+        ##
+      } else if (osType == "Linux") {
+        ##
         exhaustive_chemical_enumeration_annotated_table <- do.call(rbind, mclapply(selected_IPA_peaks, function(i_mz) {
           exhaustive_chemical_enumeration_call(i_mz)
         }, mc.cores = number_processing_threads))
