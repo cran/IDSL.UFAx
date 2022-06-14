@@ -1,5 +1,6 @@
 UFAx_workflow <- function(spreadsheet) {
   ##
+  exhaustive_chemical_enumeration_annotated_table <- c()
   gc()
   initiation_time <- Sys.time()
   message("Initiated testing the spreadsheet consistency!")
@@ -15,7 +16,7 @@ UFAx_workflow <- function(spreadsheet) {
     }
   } else if (length(spreadsheet) == 1) {
     if (typeof(spreadsheet) == "character") {
-      if (file.exists(spreadsheet)){
+      if (file.exists(spreadsheet)) {
         spreadsheet <- readxl::read_xlsx(spreadsheet, sheet = "exhaustive_chemical_enumeration")
         PARAM_ECE <- cbind(spreadsheet[, 2], spreadsheet[, 4])
         checkpoint_parameter <- TRUE
@@ -44,7 +45,7 @@ UFAx_workflow <- function(spreadsheet) {
       checkpoint_parameter <- FALSE
       message("ERROR!!! Problem with ECE0001! Folder of peaklist is not available!")
     }
-    peaklist <- loadRdata(pl_file)
+    peaklist <- IDSL.IPA::loadRdata(pl_file)
     peaklist <- matrix(peaklist, ncol = 24)
     n_peaks <- dim(peaklist)[1]
     ##
@@ -57,8 +58,8 @@ UFAx_workflow <- function(spreadsheet) {
         selected_IPA_peaks <- 1:n_peaks
         message("The enitre 12C m/z values in the peaklist were placed in the processing row! Annotated molecular formulas for peak IDs are kept in the 'log_ECE_annotation_' folder!")
       } else {
-        selected_IPA_peaks <- tryCatch(eval(parse(text = paste0("c(", ECE0003, ")"))), error = function(e){NA})
-        if (is.na(selected_IPA_peaks[1]) | (max(selected_IPA_peaks) > n_peaks)) {
+        selected_IPA_peaks <- tryCatch(eval(parse(text = paste0("c(", ECE0003, ")"))), error = function(e){NULL})
+        if (is.null(selected_IPA_peaks) | (max(selected_IPA_peaks) > n_peaks)) {
           checkpoint_parameter <- FALSE
           message("ERROR!!! Problem with ECE0003! The range of indices are out of the peaklist dimension!")
         } else {
@@ -284,8 +285,8 @@ UFAx_workflow <- function(spreadsheet) {
       checkpoint_parameter <- FALSE
     }
     ##
-    UFA_IP_memeory_variables <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0024'), 2], ")"))), error = function(e){NA})
-    if ((length(UFA_IP_memeory_variables) != 2) | is.na(UFA_IP_memeory_variables[1])) {
+    UFA_IP_memeory_variables <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0024'), 2], ")"))), error = function(e){NULL})
+    if (length(UFA_IP_memeory_variables) != 2) {
       message("ERROR!!! Problem with ECE0024! This parameter should be a vector of two positive numbers!")
       checkpoint_parameter <- FALSE
     }
@@ -377,8 +378,8 @@ UFAx_workflow <- function(spreadsheet) {
       }
     }
     ##
-    Score_coeff <- tryCatch(eval(parse(text = PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0033'), 2])), error = function(e){NA})
-    if (is.na(Score_coeff[1])) {
+    Score_coeff <- tryCatch(eval(parse(text = PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0033'), 2])), error = function(e){NULL})
+    if (is.null(Score_coeff)) {
       message("ERROR!!! Problem with ECE0033! This parameter should be a vector of five positive numbers!")
       checkpoint_parameter <- FALSE
     } else {
@@ -393,17 +394,15 @@ UFAx_workflow <- function(spreadsheet) {
       message("ERROR!!! Problem with ECE0034!")
       checkpoint_parameter <- FALSE
     } else {
-      if (tolower(ECE0034) == "yes" | tolower(ECE0034) == "no") {
-        message("\n")
-      } else {
+      if (!(tolower(ECE0034) == "yes" | tolower(ECE0034) == "no")) {
         message("ERROR!!! Problem with ECE0034!")
         checkpoint_parameter <- FALSE
       }
     }
     ##
     if (tolower(ECE0034) == "yes") {
-      IonPathways <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0035'), 2], ")"))), error = function(e){NA})
-      if (is.na(IonPathways[1])) {
+      IonPathways <- tryCatch(eval(parse(text = paste0("c(", PARAM_ECE[which(PARAM_ECE[, 1] == 'ECE0035'), 2], ")"))), error = function(e){NULL})
+      if (is.null(IonPathways)) {
         message("ERROR!!! Problem with ECE0035!")
         checkpoint_parameter <- FALSE
       }
@@ -431,7 +430,7 @@ UFAx_workflow <- function(spreadsheet) {
       EL <- element_sorter(ElementList = Elements, ElementOrder = "same")
       Elements_mass_abundance <- EL[[2]]
       valence_vec <- EL[[3]]
-      Elements_mass <- sapply(1:L_Elements, function (el) {
+      Elements_mass <- sapply(1:L_Elements, function(el) {
         Elements_mass_abundance[[el]][[1]][1]
       })
       ##########################################################################
@@ -447,8 +446,8 @@ UFAx_workflow <- function(spreadsheet) {
                               limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_2_a <- set_2
-        set_2_a[!set_2_a%in%carbon_masses] <- 0
-        set_2_a[set_2_a%in%carbon_masses] <- 1
+        set_2_a[!set_2_a %in% carbon_masses] <- 0
+        set_2_a[set_2_a %in% carbon_masses] <- 1
         set_2 <- set_2[which(rowSums(set_2_a) > 0),]
         
         set_3 <- comboGeneral(qvec,3,FALSE,constraintFun = "sum",
@@ -456,8 +455,8 @@ UFAx_workflow <- function(spreadsheet) {
                               limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_3_a <- set_3
-        set_3_a[!set_3_a%in%carbon_masses] <- 0
-        set_3_a[set_3_a%in%carbon_masses] <- 1
+        set_3_a[!set_3_a %in% carbon_masses] <- 0
+        set_3_a[set_3_a %in% carbon_masses] <- 1
         set_3 <- set_3[which(rowSums(set_3_a) > 0),]
         
         set_4 <- comboGeneral(qvec,4,FALSE,constraintFun = "sum",
@@ -465,8 +464,8 @@ UFAx_workflow <- function(spreadsheet) {
                               limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_4_a <- set_4
-        set_4_a[!set_4_a%in%carbon_masses] <- 0
-        set_4_a[set_4_a%in%carbon_masses] <- 1
+        set_4_a[!set_4_a %in% carbon_masses] <- 0
+        set_4_a[set_4_a %in% carbon_masses] <- 1
         set_4 <- set_4[which(rowSums(set_4_a) > 0),]
         
         set_5 <- comboGeneral(qvec,5,FALSE,constraintFun = "sum",
@@ -474,8 +473,8 @@ UFAx_workflow <- function(spreadsheet) {
                               limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_5_a <- set_5
-        set_5_a[!set_5_a%in%carbon_masses] <- 0
-        set_5_a[set_5_a%in%carbon_masses] <- 1
+        set_5_a[!set_5_a %in% carbon_masses] <- 0
+        set_5_a[set_5_a %in% carbon_masses] <- 1
         set_5 <- set_5[which(rowSums(set_5_a) > 0),]
         
         set_6 <- comboGeneral(qvec,6,FALSE,constraintFun = "sum",
@@ -483,19 +482,19 @@ UFAx_workflow <- function(spreadsheet) {
                               limitConstraints = c((query_mz - mass_accuracy), (query_mz + mass_accuracy)),
                               keepResults = TRUE)
         set_6_a <- set_6
-        set_6_a[!set_6_a%in%carbon_masses] <- 0
-        set_6_a[set_6_a%in%carbon_masses] <- 1
+        set_6_a[!set_6_a %in% carbon_masses] <- 0
+        set_6_a[set_6_a %in% carbon_masses] <- 1
         set_6 <- set_6[which(rowSums(set_6_a) > 0), ]
         ##
         get_formula_text <- function(sety) {
-          if(is.matrix(sety) == F) {
+          if (is.matrix(sety) == F) {
             sety <- t(as.matrix(sety))
           }
-          if(nrow(sety) > 0) {
-            form_mat <- sapply(1:(ncol(sety)-1), function(z){
+          if (nrow(sety) > 0) {
+            form_mat <- sapply(1:(ncol(sety) - 1), function(z) {
               as.character(atom_vec[as.character(sety[,z])])
             })
-            if(!is.matrix(form_mat )) {
+            if (!is.matrix(form_mat)) {
               form_mat <-  t(as.matrix(form_mat ))
             }
             apply(form_mat , 1, paste0, collapse = "")
@@ -721,7 +720,7 @@ UFAx_workflow <- function(spreadsheet) {
       exhaustive_chemical_enumeration_call <- gsub("int_cutoff_str", int_cutoff_str, exhaustive_chemical_enumeration_call)
       eval(parse(text = exhaustive_chemical_enumeration_call))
       ##########################################################################
-      outputer003 <- IPA_MSdeconvoluter(HRMS_path = mass_spec_file, MSfile = "")
+      outputer003 <- IDSL.IPA::IPA_MSdeconvoluter(HRMS_path = mass_spec_file, MSfile = "")
       spectraList <- outputer003[[1]]
       ## Creating the log folder
       output_path_log <- paste0(output_path, "/log_ECE_annotation_", ECE0005, "/")
@@ -754,7 +753,7 @@ UFAx_workflow <- function(spreadsheet) {
       rownames(exhaustive_chemical_enumeration_annotated_table) <- c()
       if (tolower(ECE0034) == "yes") {
         message("Initiated searching in the library of molecular formula!!!")
-        MF_library <- loadRdata(PubChem_library_path)
+        MF_library <- IDSL.IPA::loadRdata(PubChem_library_path)
         MF_ex_chem_enum <- exhaustive_chemical_enumeration_annotated_table[, 3]
         MF_library_matched <- UFAx_molecular_formula_library_search(MF_ex_chem_enum, IonPathways, Elements, MF_library, number_processing_threads)
         exhaustive_chemical_enumeration_annotated_table <- cbind(exhaustive_chemical_enumeration_annotated_table, MF_library_matched)
@@ -769,4 +768,5 @@ UFAx_workflow <- function(spreadsheet) {
       message("Please visit   https://ufa.idsl.me    for instructions!!!")
     }
   }
+  return(exhaustive_chemical_enumeration_annotated_table)
 }

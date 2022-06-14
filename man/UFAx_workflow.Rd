@@ -11,16 +11,19 @@ UFAx_workflow(spreadsheet)
 }
 \arguments{
   \item{spreadsheet}{
-spreadsheet
+IDSL.UFAx parameter spreadsheet
 }
 }
 \value{
 The MolecularFormulaAnnotationTable is saved in the assigned folder in the parameter spreadsheet.
 }
+\note{
+You should load the IDSL.UFA package to run the IDSL.UFAx functions.
+}
 \examples{
 \donttest{
+library(IDSL.UFA) # You should load the IDSL.UFA package to run the IDSL.UFAx functions.
 library(IDSL.UFAx)
-library(IDSL.UFA)
 s_path <- system.file("extdata", package = "IDSL.UFAx")
 SSh1 <- paste0(s_path,"/UFAx_parameters.xlsx")
 temp_wd <- tempdir() # update this address
