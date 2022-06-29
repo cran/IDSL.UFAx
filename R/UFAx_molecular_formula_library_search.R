@@ -88,5 +88,10 @@ UFAx_molecular_formula_library_search <- function(molecular_formula_ions, IonPat
     ##
     closeAllConnections()
   }
+  ##
+  MF_cbind <- data.frame(MF_cbind)
+  colnames(MF_cbind) <- NULL
+  rownames(MF_cbind) <- NULL
+  ##
   return(MF_cbind)
 }
