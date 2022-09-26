@@ -1,7 +1,7 @@
 Package: IDSL.UFAx
 Type: Package
 Title: Exhaustive Chemical Enumeration for United Formula Annotation
-Version: 1.5
+Version: 1.6
 Authors@R: c(
     person(family = "Fakouri-Baygi", given = "Sadjad", email = "sadjad.fakouri-baygi@mssm.edu",
     role = c("cre","aut"), comment = c(ORCID = "0000-0002-6864-6911")),
@@ -24,6 +24,6 @@ BugReports: https://github.com/idslme/idsl.ufax/issues
 Encoding: UTF-8
 Archs: i386, x64
 NeedsCompilation: no
-Packaged: 2022-09-09 14:55:55 UTC; sfbaygi
+Packaged: 2022-09-26 00:03:46 UTC; sfbaygi
 Repository: CRAN
-Date/Publication: 2022-09-09 23:52:55 UTC
+Date/Publication: 2022-09-26 11:40:02 UTC
