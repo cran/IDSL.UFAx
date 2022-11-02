@@ -1,11 +1,11 @@
-0798f90a855e2f9e7a542f90b73901b7 *DESCRIPTION
+18cb33989bd62818b1908119d4cff4a4 *DESCRIPTION
 c3a14a193e7c8a9b2427cc5eab33f74a *LICENSE
-ad7963025d6618287b4b9c714f5685cc *NAMESPACE
+b4115cee6636a81691b3c947ae105411 *NAMESPACE
 efe02a00fd16b736f69492fda496340d *R/UFAx_molecular_formula_library_search.R
-17bdd44ff8d4cc9a62a7b9851abceb70 *R/UFAx_score_coefficient_corrector.R
-67768efc0ec8a51ee1cdf654332d2aa6 *R/UFAx_workflow.R
+bcd33a070208b040f60dcdba883cd266 *R/UFAx_score_coefficient_corrector.R
+41fff9428c7a9b21a88b4ec6a316f9e0 *R/UFAx_workflow.R
 78856adbf3b4da39425ad69eb7a09e54 *R/global.R
-ec8385156e53678b27d50ae395537ebc *inst/CITATION
+5fbd5a3f4b5bb143e8678d44a4334381 *inst/CITATION
 8429f59d4f3f83646202abfb278a9bfa *inst/extdata/UFAx_parameters.xlsx
 ec6c9a4bdaa66c9c4021792bde0310af *man/UFAx_molecular_formula_library_search.Rd
 aff3363e84f8a08b14ff2a9056c116c6 *man/UFAx_score_coefficient_corrector.Rd
